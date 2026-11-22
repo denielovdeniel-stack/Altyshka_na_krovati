@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
-  "id": "antieffects",
+  "id": "visualhelper",
   "version": "${version}",
-  "name": "AntiEffects & Glow",
-  "description": "Отключает туман, тошноту, слепоту, тьму (K) и подсвечивает сущностей (N).",
-  "authors": ["You"],
+  "name": "Visual Helper",
+  "description": "Client-side toggle for fog/darkness/blindness/nausea (K) and entity glow (N).",
+  "authors": ["Player"],
   "license": "MIT",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.example.antieffects.AntiEffectsClient"
+      "com.example.visualhelper.VisualHelperClient"
     ]
   },
   "mixins": [
-    "antieffects.mixins.json"
+    "visualhelper.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.19.5",
