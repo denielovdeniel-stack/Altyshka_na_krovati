@@ -1,30 +1,58 @@
-package com.example;
+package com.example.antieffects;
 
-import net.fabricmc.api.ModInitializer;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.network.chat.Component;
 
-import net.minecraft.resources.Identifier;
+public class AntiEffectsClient implements ClientModInitializer {
+    public static boolean noFogAndEffects = false;
+    public static boolean forceGlowing = false;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+    private static KeyMapping toggleEffectsKey;
+    private static KeyMapping toggleGlowKey;
 
-public class ExampleMod implements ModInitializer {
-	public static final String MOD_ID = "modid";
+    @Override
+    public void onInitializeClient() {
+        // Клавиша K (InputConstants вместо GLFW в 26.3)
+        toggleEffectsKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.antieffects.toggle_effects",
+                InputConstants.Type.KEYSYM,
+                InputConstants.KEY_K,
+                KeyMapping.Category.MISC
+        ));
 
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+        // Клавиша N
+        toggleGlowKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.antieffects.toggle_glow",
+                InputConstants.Type.KEYSYM,
+                InputConstants.KEY_N,
+                KeyMapping.Category.MISC
+        ));
 
-	@Override
-	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (toggleEffectsKey.consumeClick()) {
+                noFogAndEffects = !noFogAndEffects;
+                if (client.player != null) {
+                    client.player.displayClientMessage(
+                            Component.literal("§eАнти-туман и эффекты: " + (noFogAndEffects ? "§aВКЛ" : "§cВЫКЛ")),
+                            true
+                    );
+                }
+            }
 
-		LOGGER.info("Hello Fabric world!");
-	}
-
-	public static Identifier id(String path) {
-		return Identifier.fromNamespaceAndPath(MOD_ID, path);
-	}
+            while (toggleGlowKey.consumeClick()) {
+                forceGlowing = !forceGlowing;
+                if (client.player != null) {
+                    client.player.displayClientMessage(
+                            Component.literal("§eПодсветка сущностей: " + (forceGlowing ? "§aВКЛ" : "§cВЫКЛ")),
+                            true
+                    );
+                }
+            }
+        });
+    }
 }
+
